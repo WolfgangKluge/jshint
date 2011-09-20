@@ -214,7 +214,7 @@
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
- parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
+ parent, parseFloat, parseInt, passfail, plusplus, pop, predef, print, process, prompt,
  proto, prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
@@ -223,7 +223,11 @@
  split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
  sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, validthis, value, valueOf,
- var, version, WebSocket, white, window, Worker, wsh*/
+ var, version, WebSocket, white, window, Worker, wsh,
+ format, currentLevel,
+ inc, dec, currentPosition, getString, lengthOf, levelFrom, levelOf, set, unset,
+ indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
+ useTabs, tabSize, firstLevel*/
 
 /*global exports: false */
 
@@ -324,6 +328,13 @@ var JSHINT = (function () {
 
         // These are the JSHint complex options.
         complexOptions = {
+            format: {
+                indent: {
+                    useTabs: false,         // use tab instead of blanks
+                    tabSize: 4,             // indentation or size of a single tab
+                    firstLevel: false       // indent first level
+                }
+            }
         },
 
         // browser contains a set of global names which are commonly provided by a
@@ -1991,6 +2002,110 @@ loop:   for (;;) {
         return left;
     }
 
+
+// format check
+// don't put parser functionality (e.g. "advance()") in there,
+// so it can be easily replaced by another implementation
+    var format = (function(){
+        function getTabbedWhite(add) {
+            return new Array(option.format.indent.tabSize + 1 + (add || 0)).join(" ");
+        }
+        
+        var indent = (function(){
+            var indentLevel = 0, addPos = 0;
+            var store = [];
+            function currentLevel() {
+                return indentLevel + (option.format.indent.firstLevel ? 1 : 0);
+            }
+            
+            return {
+                inc: function(){
+                    indentLevel++;
+                },
+                
+                dec: function(){
+                    indentLevel--;
+                    if (indentLevel < 0) {
+                        error("Indent level < 0...", token);
+                    }
+                },
+                
+                currentLevel: currentLevel,
+                
+                currentPosition: function (){
+                    return currentLevel() * option.format.indent.tabSize + addPos;
+                },
+                
+                getString: function(){
+                    return new Array(currentLevel() + 1).join(
+                        option.format.indent.useTabs ?
+                        "\t" :
+                        getTabbedWhite(addPos)
+                    );
+                },
+                
+                lengthOf: function (s) {
+                    return s.replace(/\t/g, getTabbedWhite(0)).length;
+                },
+                
+                levelFrom: function (n) {
+                    var ts = option.format.indent.tabSize;
+                    return (n - (n % ts)) / ts;
+                },
+                
+                levelOf: function (s) {
+                    var r = new RegExp("\t|[ ]{" + option.format.indent.tabSize + "}", "g");
+                    return s.split(r).length - 1;
+                },
+                
+                set: function (val, isPosition, indentFromHere) {
+                    store.push(indentLevel);
+                    store.push(addPos);
+                    
+                    if (isPosition) {
+                        var ts = option.format.indent.tabSize;
+                        if (indentFromHere) addPos = val % ts;
+                        val = (val - (val % ts)) / ts;
+                    }
+                    indentLevel = val;
+                },
+                
+                unset: function () {
+                    addPos = store.pop();
+                    indentLevel = store.pop();
+                }
+            };
+        } )();
+        
+        function escapeWhitespace(s, maxlen) {
+            return (s.length > maxlen ? s.substr(0, maxlen) + "..." : s)
+                .replace(/ /g, "\xB7")
+                .replace(/\f/g, "\\f")
+                .replace(/\t/g, "\\t")
+                .replace(/\xA0/g, "*");
+        }
+        
+        function rightMost(l) {
+            var ret = l;
+            while (ret.right !== undefined && ret.right !== null) {
+                ret = ret.right;
+            }
+            return ret;
+        }
+        
+        function warnWhitespace(msg, t, a, b, c, d) {
+            warning(msg, t, escapeWhitespace(a), b, c, d);
+        }
+        
+        return {
+            indent: {
+                inc: indent.inc,
+                dec: indent.dec,
+                set: indent.set,
+                unset: indent.unset
+            }
+        };
+    })();
 
 // Functions for conformance of style.
 
