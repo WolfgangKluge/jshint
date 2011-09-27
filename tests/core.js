@@ -142,3 +142,36 @@ exports.jslintOptions = function() {
     var src = fs.readFileSync(__dirname + '/fixtures/jslintOptions.js', 'utf8');
     TestRun().test(src);
 };
+
+exports.complexOptions = function() {
+    var src = fs.readFileSync(__dirname + '/fixtures/complexOptions.js', 'utf8');
+
+    assert.ok(!JSHINT(src, {complex: true}));
+    assert.eql(JSHINT.errors.length, 13);
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "Unknown complex option 'complex'.");
+    assert.eql(JSHINT.errors[1].line, 3);
+    assert.eql(JSHINT.errors[1].reason, "Unknown option 'x'.");
+    assert.eql(JSHINT.errors[2].line, 7);
+    assert.eql(JSHINT.errors[2].reason, "Unknown complex option 'complex'.");
+    assert.eql(JSHINT.errors[3].line, 8);
+    assert.eql(JSHINT.errors[3].reason, "Unknown option 'x'.");
+    assert.eql(JSHINT.errors[4].line, 9);
+    assert.eql(JSHINT.errors[4].reason, "Unknown option 'y'.");
+    assert.eql(JSHINT.errors[5].line, 17);
+    assert.eql(JSHINT.errors[5].reason, "Unknown complex option 'complex'.");
+    assert.eql(JSHINT.errors[6].line, 18);
+    assert.eql(JSHINT.errors[6].reason, "Unknown option 'a'.");
+    assert.eql(JSHINT.errors[7].line, 19);
+    assert.eql(JSHINT.errors[7].reason, "Unknown option 'b'.");
+    assert.eql(JSHINT.errors[8].line, 20);
+    assert.eql(JSHINT.errors[8].reason, "Unknown option 'c'.");
+    assert.eql(JSHINT.errors[9].line, 21);
+    assert.eql(JSHINT.errors[9].reason, "Unknown option 'd'.");
+    assert.eql(JSHINT.errors[10].line, 26);
+    assert.eql(JSHINT.errors[10].reason, "Bad option value.");
+    assert.eql(JSHINT.errors[11].line, 28);
+    assert.eql(JSHINT.errors[11].reason, "Bad option.");
+    assert.eql(JSHINT.errors[12].line, 28);
+    assert.eql(JSHINT.errors[12].reason, "Missing option value.");
+};
