@@ -321,6 +321,10 @@ var JSHINT = (function () {
                                 // should be predefined
         },
 
+        // These are the JSHint complex options.
+        complexOptions = {
+        },
+
         // browser contains a set of global names which are commonly provided by a
         // web browser environment.
         browser = {
@@ -859,6 +863,21 @@ var JSHINT = (function () {
         for (n in o) {
             if (is_own(o, n)) {
                 t[n] = o[n];
+            }
+        }
+    }
+
+    function combineabsent(t, o) {
+        var n;
+        for (n in o) {
+            if (is_own(o, n)) {
+                if (t[n] === undefined || t[n] === null || typeof t[n] !== typeof o[n]) {
+                    // overwrite undefined and misdefined values so at the end
+                    // all values have the expected type
+                    t[n] = o[n];
+                } else if (typeof o[n] === 'object') {
+                    combineabsent(t[n], o[n]);
+                }
             }
         }
     }
@@ -1611,6 +1630,84 @@ klass:                                  do {
     }
 
 
+    function doComplexOption(complex, t) {
+        function nextToken() {
+            var ret = lookahead.shift() || lex.token();
+            while(ret.id === '(endline)'){
+                ret = lookahead.shift() || lex.token();
+            }
+            return ret;
+        }
+        
+		// parse "simple-json" inside /*jslint - options
+        function jsonOptionObject(ret) {
+            var name, state = 0;
+            
+            for(;;){
+                t = nextToken();
+				if (state === 3 && t.id === ',') {
+					state = 0;
+				} else if ((state === 3 || state === 0) && t.id === '}') {
+					return;
+				} else if (state === 0) {
+					if (t.identifier || t.id === "(string)") {
+						name = t.value;
+						if( ret[name] === undefined ){
+							warning("Unknown option '{a}'.", t, name);
+						}
+						state = 1;
+					} else {
+						error("Expected option name or value and instead saw '{a}'.", t, t.value);
+					}
+				} else if (state === 1) {
+					if (t.id === ':') {
+						state = 2;
+					} else {
+						error("Expected {a} and instead saw '{b}'.", t, ':', t.value);
+					}
+				} else if (state === 2) {
+					if (t.identifier) {
+						if (t.value === "true") {
+							ret[name] = true;
+						} else if (t.value === "false") {
+							ret[name] = false;
+						} else {
+							// any other identifier is used as string
+							ret[name] = t.value;
+						}
+					} else if (t.id === '(string)') {
+						ret[name] = t.value;
+					} else if (t.id === '(number)') {
+						ret[name] = +t.value;
+					} else if (t.id === '{') {
+						if (ret[name] === undefined) {
+							// consume values, but ignore them
+							jsonOptionObject({});
+						} else {
+							if (ret[name] === null) {
+								ret[name] = {};
+							}
+							jsonOptionObject(ret[name]);
+						}
+					} else {
+						error("Expected value and instead saw '{a}'.", t, t.value);
+					}
+					state = 3;
+				} else {
+					error("Unexpected '{a}'.", t, t.value);
+				}
+            }
+            error("Missing }", t);
+        }
+
+        if (t.id === '{') {
+            jsonOptionObject(complex);
+        } else {
+            error("Expected a JSON value.", t);
+        }
+    }
+
+
     function doOption() {
         var b, obj, filter, o = nexttoken.value, t, v;
         switch (o) {
@@ -1683,6 +1780,16 @@ loop:   for (;;) {
                                 v, v.value);
                     }
                     obj.maxlen = b;
+                } else if (v.id === '{' && o === '/*jshint') {
+                    // only allow /*jshint to use complex options. So switching back to
+                    // jslint (if someone likes to) does not provoke a stop error (Unexpected '{'.)
+                    if (t.value in complexOptions) {
+                      doComplexOption(obj[t.value], v);
+                    } else {
+                      // warn but consume
+                      warning("Unknown complex option '{a}'.", v, t.value);
+                      doComplexOption({}, v);
+                    }
                 } else if (t.value == 'validthis') {
                     if (funct['(global)']) {
                         error("Option 'validthis' can't be used in a global scope.");
@@ -3742,6 +3849,8 @@ loop:   for (;;) {
         }
         option.indent = option.indent || 4;
         option.maxerr = option.maxerr || 50;
+
+        combineabsent(option, complexOptions);
 
         tab = '';
         for (i = 0; i < option.indent; i += 1) {
