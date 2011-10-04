@@ -229,8 +229,9 @@
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
  useTabs, tabSize, firstLevel, caseLabel, caseContent, rules, needed,
  common, expr_dot, dot_expr, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
+ identifier_parenthesis, expr_parenthesis, parenthesis_expr,
  operators, unary_expr, expr_op, op_expr,
- block, identifier_bracket, parenthesis_bracket*/
+ block, identifier_bracket, bracket_identifier, parenthesis_bracket*/
 
 /*global exports: false */
 
@@ -345,13 +346,16 @@ var JSHINT = (function () {
                 rules: {
                     needed: " ",            // e.g. before and after 'in' or after 'delete'
                     common: {
-                        expr_dot: "",       // x_.y()
-                        dot_expr: "",       // x._y()
-                        expr_comma: "",     // 1_, 2
-                        comma_expr: " ",    // 1,_2
-                        label_colon: "",    // label_:
-                        expr_semicolon: "", // x.y()_;
-                        semicolon_expr: " " // x.y();_x = 2
+                        expr_dot: "",                 // x_.y()
+                        dot_expr: "",                 // x._y()
+                        expr_comma: "",               // 1_, 2
+                        comma_expr: " ",              // 1,_2
+                        label_colon: "",              // label_:
+                        expr_semicolon: "",           // x.y()_;
+                        semicolon_expr: " ",          // x.y();_x = 2
+                        identifier_parenthesis: " ",  // if_(, while_(, catch_( ...
+                        expr_parenthesis: "",         // if ( true_), ...
+                        parenthesis_expr: ""          // if (_true, while (_1, ...
                     },
                     operators: {
                         unary_expr: "",     // -_2  new, void and delete are excluded from this rule
@@ -360,6 +364,7 @@ var JSHINT = (function () {
                     },
                     block: {
                         identifier_bracket: " ",  // else_{, finally_{, do_{, ...
+                        bracket_identifier: " ",  // }_else, }_catch, }_while, ...
                         parenthesis_bracket: " "  // function ()_{
                     }
                 }
@@ -3725,9 +3730,12 @@ loop:   for (;;) {
 
         block(false);
         if (nexttoken.id === 'catch') {
+            format.testWhite(token, nexttoken, option.format.rules.block.bracket_identifier);
             advance('catch');
+            format.testWhite(token, nexttoken, option.format.rules.common.identifier_parenthesis);
             nonadjacent(token, nexttoken);
             advance('(');
+            format.testWhite(token, nexttoken, option.format.rules.common.parenthesis_expr);
             s = scope;
             scope = Object.create(s);
             e = nexttoken.value;
@@ -3738,12 +3746,14 @@ loop:   for (;;) {
                 addlabel(e, 'exception');
             }
             advance();
+            format.testWhite(token, nexttoken, option.format.rules.common.expr_parenthesis);
             advance(')');
             block(false);
             b = true;
             scope = s;
         }
         if (nexttoken.id === 'finally') {
+            format.testWhite(token, nexttoken, option.format.rules.block.bracket_identifier);
             advance('finally');
             block(false);
             return;

@@ -4,8 +4,12 @@ function  hello()  {
 }
 
 try  {
-    var  other   =    {
-        a  :   true
-    };
 }  catch   (    ex     )      {
+}
+
+try {
+}catch (ex) {}
+
+try {
+} catch (ex) {
 }
