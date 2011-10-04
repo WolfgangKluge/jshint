@@ -11,8 +11,8 @@ try {
 }catch (ex) {}
 
 try { // correct version
-} catch (ex) {
-}
+    throw   "test";
+} catch (ex) {}
 
 while  (true)   {
 }
