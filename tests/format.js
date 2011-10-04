@@ -62,6 +62,10 @@ exports.format_whitespace = function () {
         // bitwise assign
         .addError(33, "Expected whitespace '\xB7' between 'a' and '|=', but '\xB7\xB7' found.")
         .addError(33, "Expected whitespace '\xB7' between '|=' and '3', but '\xB7\xB7' found.")
+        // colons in object literals
+        .addError(36, "Unexpected whitespace '\xB7' between 'a' and ':'.")
+        .addError(37, "Unexpected whitespace '\xB7\xB7' between 'b' and ':'.")
+        .addError(37, "Expected whitespace '\xB7' between ':' and '3', but '\xB7\xB7\xB7' found.")
         .test(src, {checkformat: true})
     ;
 };

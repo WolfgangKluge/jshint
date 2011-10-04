@@ -31,3 +31,9 @@ var  a   =    2, b = 3,
 c   =  3,
         d = 4;
 a  |=  3;
+
+var to = {
+    a : 2,
+    b  :   3, // tab indented
+    c: 4
+};

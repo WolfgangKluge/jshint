@@ -232,6 +232,7 @@
  identifier_parenthesis, expr_parenthesis, parenthesis_expr, semicolon_semicolon,
  operators, unary_expr, expr_op, op_expr, name_assignment, assignment_expr,
  block, identifier_bracket, bracket_identifier, parenthesis_bracket
+ objectLiteral, name_colon, colon_expr,
  identifier_name, name_parenthesis*/
 
 /*global exports: false */
@@ -372,7 +373,10 @@ var JSHINT = (function () {
                         bracket_identifier: " ",  // }_else, }_catch, }_while, ...
                         parenthesis_bracket: " "  // function ()_{
                     },
-                    
+                    objectLiteral: {
+                        name_colon: "",           // x_: value
+                        colon_expr: " "           // x:_value
+                    },
                     "function": {
                         identifier_name: " ",            // function_x (
                         name_parenthesis: "",            // function x_(
@@ -3600,7 +3604,10 @@ loop:   for (;;) {
                     if (typeof i !== 'string') {
                         break;
                     }
+                    
+                    format.testWhite(token, nexttoken, option.format.rules.objectLiteral.name_colon);
                     advance(':');
+					format.testWhite(token, nexttoken, option.format.rules.objectLiteral.colon_expr);
                     nonadjacent(token, nexttoken);
                     expression(10);
                 }
