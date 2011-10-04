@@ -3768,8 +3768,10 @@ loop:   for (;;) {
         var t = nexttoken;
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
+        format.testWhite(token, nexttoken, option.format.rules.common.identifier_parenthesis);
         advance('(');
         nonadjacent(this, t);
+        format.testWhite(token, nexttoken, option.format.rules.common.parenthesis_expr);
         nospace();
         expression(20);
         if (nexttoken.id === '=') {
@@ -3779,6 +3781,7 @@ loop:   for (;;) {
             expression(20);
         }
         advance(')', t);
+        format.testWhite(prevtoken, token, option.format.rules.common.expr_parenthesis);
         nospace(prevtoken, token);
         block(true, true);
         funct['(breakage)'] -= 1;

@@ -26,6 +26,8 @@ exports.format_whitespace = function () {
         .addError(7, "Unexpected whitespace '\xB7\xB7\xB7\xB7\xB7' between 'ex' and ')'.")
         .addError(7, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7\xB7\xB7\xB7...' found.")
         .addError(11, "Expected whitespace '\xB7' between '}' and 'catch', but '' found.")
+        .addError(17, "Expected whitespace '\xB7' between 'while' and '(', but '\xB7\xB7' found.")
+        .addError(17, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7\xB7' found.")
         .test(src, {checkformat: true})
     ;
 };

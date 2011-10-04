@@ -10,6 +10,9 @@ try  {
 try {
 }catch (ex) {}
 
-try {
+try { // correct version
 } catch (ex) {
+}
+
+while  (true)   {
 }
