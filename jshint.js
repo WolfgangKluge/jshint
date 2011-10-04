@@ -3915,10 +3915,13 @@ loop:   for (;;) {
             funct['(breakage)'] += 1;
             funct['(loopage)'] += 1;
             this.first = block(true);
+            format.testWhite(token, nexttoken, option.format.rules.block.bracket_identifier);
             advance('while');
+            format.testWhite(token, nexttoken, option.format.rules.common.identifier_parenthesis);
             var t = nexttoken;
             nonadjacent(token, t);
             advance('(');
+            format.testWhite(token, nexttoken, option.format.rules.common.parenthesis_expr);
             nospace();
             expression(20);
             if (nexttoken.id === '=') {
@@ -3927,6 +3930,7 @@ loop:   for (;;) {
                 advance('=');
                 expression(20);
             }
+            format.testWhite(token, nexttoken, option.format.rules.common.expr_parenthesis);
             advance(')', t);
             nospace(prevtoken, token);
             funct['(breakage)'] -= 1;
