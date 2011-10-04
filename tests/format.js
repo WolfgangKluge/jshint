@@ -88,7 +88,7 @@ exports.format_whitespace = function () {
  */
 exports.format_whitespace_equal = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/format/whitespace_equal.js", "utf8");
-    
+
     TestRun()
         .addError(2, "Unexpected space after '('.")
         .addError(2, "Unexpected space after '('.")
@@ -232,4 +232,76 @@ exports.format_whitespace_equal = function () {
         .addError(37, "Expected indentation level of 0 (col 1) but found 1 (col 5).")
         .addError(38, "Expected indentation level of 1 (col 5) but found 2 (col 9).")
         .test(src, {checkformat: true, white: false});
+};
+
+/**
+ * Switch statement rules
+ * different indenting rules for switch statement
+ */
+exports.format_switch = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/format/switch.js", "utf8");
+
+    TestRun()
+        .addError(12, "Expected 'break' to have an indentation at 5 instead at 1.")
+        .addError(14, "Expected 'break' to have an indentation at 5 instead at 1.")
+        .addError(16, "Expected 'break' to have an indentation at 5 instead at 1.")
+        .addError(45, "Expected 'case' to have an indentation at 1 instead at 5.")
+        .addError(47, "Expected 'case' to have an indentation at 1 instead at 5.")
+        .addError(49, "Expected 'default' to have an indentation at 1 instead at 5.")
+        .addError(62, "Expected 'case' to have an indentation at 1 instead at 5.")
+        .addError(63, "Expected 'break' to have an indentation at 5 instead at 9.")
+        .addError(64, "Expected 'case' to have an indentation at 1 instead at 5.")
+        .addError(65, "Expected 'break' to have an indentation at 5 instead at 9.")
+        .addError(66, "Expected 'default' to have an indentation at 1 instead at 5.")
+        .addError(67, "Expected 'break' to have an indentation at 5 instead at 9.")
+        .addError(82, "Expected indentation level of 0 (col 1) but found 0 (col 3).")
+        .addError(82, "Expected 'break' to have an indentation at 5 instead at 3.")
+        .addError(83, "Expected indentation level of 0 (col 1) but found 0 (col 3).")
+        .addError(83, "Expected 'case' to have an indentation at 1 instead at 3.")
+        .addError(84, "Expected indentation level of 0 (col 1) but found 1 (col 5).")
+        .addError(86, "Expected 'break' to have an indentation at 5 instead at 1.")
+        .addError(99, "Expected indentation level of 1 (col 5) but found 0 (col 3).")
+        .addError(99, "Expected 'break' to have an indentation at 5 instead at 3.")
+        .addError(100, "Expected indentation level of 0 (col 1) but found 0 (col 3).")
+        .addError(100, "Expected 'case' to have an indentation at 1 instead at 3.")
+        .addError(103, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(103, "Expected 'break' to have an indentation at 5 instead at 1.")
+        .addError(115, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(116, "Expected indentation level of 1 (col 5) but found 0 (col 3).")
+        .addError(116, "Expected 'break' to have an indentation at 5 instead at 3.")
+        .addError(117, "Expected indentation level of 1 (col 5) but found 0 (col 3).")
+        .addError(117, "Expected 'case' to have an indentation at 1 instead at 3.")
+        .addError(119, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(120, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(120, "Expected 'break' to have an indentation at 5 instead at 1.")
+        .addError(132, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(133, "Expected indentation level of 2 (col 9) but found 0 (col 3).")
+        .addError(133, "Expected 'break' to have an indentation at 5 instead at 3.")
+        .addError(134, "Expected indentation level of 1 (col 5) but found 0 (col 3).")
+        .addError(134, "Expected 'case' to have an indentation at 1 instead at 3.")
+        .addError(135, "Expected indentation level of 2 (col 9) but found 1 (col 5).")
+        .addError(136, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(137, "Expected indentation level of 2 (col 9) but found 0 (col 1).")
+        .addError(137, "Expected 'break' to have an indentation at 5 instead at 1.")
+        .test(src, {white: true});
+
+    TestRun()
+        .addError(82, "Expected indentation level of 0 (col 1) but found 0 (col 3).")
+        .addError(83, "Expected indentation level of 0 (col 1) but found 0 (col 3).")
+        .addError(84, "Expected indentation level of 0 (col 1) but found 1 (col 5).")
+        .addError(99, "Expected indentation level of 1 (col 5) but found 0 (col 3).")
+        .addError(100, "Expected indentation level of 0 (col 1) but found 0 (col 3).")
+        .addError(103, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(115, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(116, "Expected indentation level of 1 (col 5) but found 0 (col 3).")
+        .addError(117, "Expected indentation level of 1 (col 5) but found 0 (col 3).")
+        .addError(119, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(120, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(132, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(133, "Expected indentation level of 2 (col 9) but found 0 (col 3).")
+        .addError(134, "Expected indentation level of 1 (col 5) but found 0 (col 3).")
+        .addError(135, "Expected indentation level of 2 (col 9) but found 1 (col 5).")
+        .addError(136, "Expected indentation level of 1 (col 5) but found 0 (col 1).")
+        .addError(137, "Expected indentation level of 2 (col 9) but found 0 (col 1).")
+        .test(src, {white: false});
 };
