@@ -227,7 +227,7 @@
  format, currentLevel,
  inc, dec, currentPosition, getString, lengthOf, levelFrom, levelOf, set, unset,
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
- useTabs, tabSize, firstLevel,
+ useTabs, tabSize, firstLevel, caseLabel, caseContent,
  rules, common, expr_comma, comma_expr*/
 
 /*global exports: false */
@@ -334,7 +334,9 @@ var JSHINT = (function () {
                 indent: {
                     useTabs: false,         // use tab instead of blanks
                     tabSize: 4,             // indentation or size of a single tab
-                    firstLevel: false       // indent first level
+                    firstLevel: false,      // indent first level
+                    caseLabel: false,       // indent case labels (including default:)
+                    caseContent: true       // indent content of a case block
                 },
                 
                 rules: {
@@ -3726,15 +3728,17 @@ loop:   for (;;) {
         t = nexttoken;
         advance('{');
         nonadjacent(token, nexttoken);
-        format.indent.inc();
+        if (option.format.indent.caseLabel) format.indent.inc();
         indent += option.indent;
         this.cases = [];
         for (;;) {
             switch (nexttoken.id) {
             case 'case':
                 switch (funct['(verb)']) {
-                case 'break':
                 case 'case':
+                    if (option.format.indent.caseContent) format.indent.dec();
+                    break;
+                case 'break':
                 case 'continue':
                 case 'return':
                 case 'switch':
@@ -3755,6 +3759,7 @@ loop:   for (;;) {
                 this.cases.push(expression(20));
                 g = true;
                 advance(':');
+                if (option.format.indent.caseContent) format.indent.inc();
                 funct['(verb)'] = 'case';
                 break;
             case 'default':
@@ -3769,15 +3774,18 @@ loop:   for (;;) {
                         warning(
                             "Expected a 'break' statement before 'default'.",
                             token);
+                    } else {
+                        if (option.format.indent.caseContent) format.indent.dec();
                     }
                 }
                 indentation(-option.indent);
                 advance('default');
                 g = true;
                 advance(':');
+                if (option.format.indent.caseContent) format.indent.inc();
                 break;
             case '}':
-                format.indent.dec();
+                if (option.format.indent.caseLabel) format.indent.dec();
                 indent -= option.indent;
                 indentation();
                 advance('}', t);
@@ -3800,6 +3808,7 @@ loop:   for (;;) {
                         return;
                     case ':':
                         statements();
+                        if (option.format.indent.caseContent) format.indent.dec();
                         break;
                     default:
                         error("Missing ':' on a case clause.", token);
