@@ -234,7 +234,7 @@
  block, identifier_bracket, bracket_identifier, parenthesis_bracket, identifier_identifier,
  objectLiteral, name_colon, colon_expr,
  identifier_name, name_parenthesis,
- if*/
+ if, switch, case_expr, expr_colon*/
 
 /*global exports: false */
 
@@ -380,14 +380,22 @@ var JSHINT = (function () {
                         colon_expr: " "           // x:_value
                     },
                     "function": {
-                        identifier_name: " ",            // function_x (
-                        name_parenthesis: "",            // function x_(
-                        identifier_parenthesis: " "      // function_(       anonymous function
+                        identifier_name: " ",             // function_x (
+                        name_parenthesis: "",             // function x_(
+                        identifier_parenthesis: " "       // function_(       anonymous function
                     },
                     "if": {
-                        parenthesis_expr: "",            // if (_x )
-                        expr_parenthesis: "",            // if ( x_)
-                        identifier_parenthesis: " "      // if_( x )
+                        parenthesis_expr: "",             // if (_x )
+                        expr_parenthesis: "",             // if ( x_)
+                        identifier_parenthesis: " "       // if_( x )
+                    },
+                    "switch": {
+                        parenthesis_expr: "",             // switch (_x )
+                        expr_parenthesis: "",             // switch ( x_)
+                        case_expr: " ",                   // case_x:
+                        expr_colon: "",                   // case x_:
+                        colon_expr: " ",                  // case x:_break;
+                        identifier_parenthesis: " "       // switch_(
                     }
                 }
             }
@@ -3841,12 +3849,16 @@ loop:   for (;;) {
         var t = nexttoken,
             g = false;
         funct['(breakage)'] += 1;
+        format.testWhite(token, nexttoken, option.format.rules['switch'].identifier_parenthesis);
         advance('(');
         nonadjacent(this, t);
+        format.testWhite(token, nexttoken, option.format.rules['switch'].parenthesis_expr);
         nospace();
         this.condition = expression(20);
         advance(')', t);
+        format.testWhite(prevtoken, token, option.format.rules['switch'].expr_parenthesis);
         nospace(prevtoken, token);
+        format.testWhite(token, nexttoken, option.format.rules.block.parenthesis_bracket);
         nonadjacent(token, nexttoken);
         t = nexttoken;
         advance('{');
@@ -3880,9 +3892,12 @@ loop:   for (;;) {
                 format.indentation();
                 indentation(-option.indent);
                 advance('case');
+                format.testWhite(token, nexttoken, option.format.rules['switch'].case_expr);
                 this.cases.push(expression(20));
                 g = true;
+                format.testWhite(token, nexttoken, option.format.rules['switch'].expr_colon);
                 advance(':');
+                format.testWhite(token, nexttoken, option.format.rules['switch'].colon_expr);
                 if (option.format.indent.caseContent) format.indent.inc();
                 funct['(verb)'] = 'case';
                 break;
@@ -3906,7 +3921,9 @@ loop:   for (;;) {
                 indentation(-option.indent);
                 advance('default');
                 g = true;
+                format.testWhite(token, nexttoken, option.format.rules['switch'].expr_colon);
                 advance(':');
+                format.testWhite(token, nexttoken, option.format.rules['switch'].colon_expr);
                 if (option.format.indent.caseContent) format.indent.inc();
                 break;
             case '}':

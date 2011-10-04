@@ -71,6 +71,11 @@ exports.format_whitespace = function () {
         .addError(41, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7' found.")
         .addError(41, "Expected whitespace '\xB7' between '}' and 'else', but '\xB7\xB7' found.")
         .addError(41, "Expected whitespace '\xB7' between 'else' and 'if', but '\xB7\xB7' found.")
+        // switch
+        .addError(43, "Expected whitespace '\xB7' between 'switch' and '(', but '\xB7\xB7' found.")
+        .addError(43, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7' found.")
+        .addError(44, "Expected whitespace '\xB7' between 'case' and '1', but '\xB7\xB7\xB7' found.")
+        .addError(44, "Unexpected whitespace '\xB7\xB7' between '1' and ':'.")
         .test(src, {checkformat: true})
     ;
 };

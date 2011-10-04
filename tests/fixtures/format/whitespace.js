@@ -39,3 +39,12 @@ var to = {
 };
 
 if  (1 === 2)  {}  else  if (2 === 3) {}
+
+switch  (a)  {
+case   1  :
+    break;
+case 2:
+    break;
+default:
+    break;
+}
