@@ -229,8 +229,8 @@
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
  useTabs, tabSize, firstLevel, caseLabel, caseContent, rules, needed,
  common, expr_dot, dot_expr, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
- identifier_parenthesis, expr_parenthesis, parenthesis_expr, semicolon_semicolon
- operators, unary_expr, expr_op, op_expr,
+ identifier_parenthesis, expr_parenthesis, parenthesis_expr, semicolon_semicolon,
+ operators, unary_expr, expr_op, op_expr, name_assignment, assignment_expr,
  block, identifier_bracket, bracket_identifier, parenthesis_bracket*/
 
 /*global exports: false */
@@ -333,6 +333,7 @@ var JSHINT = (function () {
 
         // These are the JSHint complex options.
         complexOptions = {
+            /*jshint maxlen:500 */
             format: {
                 indent: {
                     useTabs: false,         // use tab instead of blanks
@@ -359,9 +360,11 @@ var JSHINT = (function () {
                         semicolon_semicolon: ""       // for (;_;) in empty for-statements
                     },
                     operators: {
-                        unary_expr: "",     // -_2  new, void and delete are excluded from this rule
-                        expr_op: " ",       // 1 +_2
-                        op_expr: " "        // 1_+ 2
+                        unary_expr: "",         // -_2  new, void and delete are excluded from this rule
+                        expr_op: " ",           // 1 +_2
+                        op_expr: " ",           // 1_+ 2
+                        name_assignment: " ",   // var x_= 2
+                        assignment_expr: " "    // var x =_2
                     },
                     block: {
                         identifier_bracket: " ",  // else_{, finally_{, do_{, ...
@@ -3624,13 +3627,14 @@ loop:   for (;;) {
     var varstatement = stmt('var', function (prefix) {
         // JavaScript does not have block scope. It only has function scope. So,
         // declaring a variable in a block can have unexpected consequences.
-        var id, name, value;
+        var id, name, value, pt;
 
         if (funct['(onevar)'] && option.onevar) {
             warning("Too many var statements.");
         } else if (!funct['(global)']) {
             funct['(onevar)'] = true;
         }
+        format.testWhite(token, nexttoken, option.format.rules.needed);
         this.first = [];
         for (;;) {
             nonadjacent(token, nexttoken);
@@ -3645,6 +3649,7 @@ loop:   for (;;) {
             name = token;
             this.first.push(token);
             if (nexttoken.id === '=') {
+                format.testWhite(token, nexttoken, option.format.rules.operators.name_assignment);
                 nonadjacent(token, nexttoken);
                 advance('=');
                 nonadjacent(token, nexttoken);
@@ -3655,7 +3660,9 @@ loop:   for (;;) {
                     error("Variable {a} was not declared correctly.",
                             nexttoken, nexttoken.value);
                 }
+                pt = token;
                 value = expression(0);
+                format.testWhite(pt, value, option.format.rules.operators.assignment_expr, false);
                 name.first = value;
             }
             if (nexttoken.id !== ',') {

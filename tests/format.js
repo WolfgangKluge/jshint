@@ -48,6 +48,13 @@ exports.format_whitespace = function () {
         .addError(25, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7\xB7' found.")
         .addError(26, "Expected whitespace '\xB7' between ';' and 'i', but '' found.")
         .addError(27, "Unexpected whitespace '\xB7\xB7' between ';' and ';'.")
+        // var
+        .addError(25, "Expected whitespace '\xB7' between 'var' and 'i', but '\xB7\xB7\xB7' found.")
+        .addError(30, "Expected whitespace '\xB7' between 'var' and 'a', but '\xB7\xB7' found.")
+        .addError(30, "Expected whitespace '\xB7' between 'a' and '=', but '\xB7\xB7\xB7' found.")
+        .addError(30, "Expected whitespace '\xB7' between '=' and '2', but '\xB7\xB7\xB7\xB7' found.")
+        .addError(31, "Expected whitespace '\xB7' between 'c' and '=', but '\xB7\xB7\xB7' found.")
+        .addError(31, "Expected whitespace '\xB7' between '=' and '3', but '\xB7\xB7' found.")
         .test(src, {checkformat: true})
     ;
 };
