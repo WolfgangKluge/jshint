@@ -229,7 +229,7 @@
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
  useTabs, tabSize, firstLevel, caseLabel, caseContent, rules, needed,
  common, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
- operators, expr_op, op_expr,
+ operators, unary_expr, expr_op, op_expr,
  block, identifier_bracket, parenthesis_bracket*/
 
 /*global exports: false */
@@ -352,6 +352,7 @@ var JSHINT = (function () {
                         semicolon_expr: " " // x.y();_x = 2
                     },
                     operators: {
+                        unary_expr: "",     // -_2  new, void and delete are excluded from this rule
                         expr_op: " ",       // 1 +_2
                         op_expr: " "        // 1_+ 2
                     },
@@ -2424,6 +2425,8 @@ loop:   for (;;) {
             }
             if (this.identifier) {
                 format.testWhite(this, this.right, option.format.rules.needed);
+            } else {
+                format.testWhite(this, this.right, option.format.rules.operators.unary_expr);
             }
             return this;
         };
@@ -3194,6 +3197,7 @@ loop:   for (;;) {
         if (option.bitwise) {
             warning("Unexpected '{a}'.", this, '~');
         }
+        format.testWhite(this, nexttoken, option.format.rules.operators.unary_expr);
         expression(150);
         return this;
     });
@@ -3204,6 +3208,7 @@ loop:   for (;;) {
         if (bang[this.right.id] === true) {
             warning("Confusing use of '{a}'.", this, '!');
         }
+        format.testWhite(this, this.right, option.format.rules.operators.unary_expr);
         return this;
     });
     prefix('typeof', 'typeof');
