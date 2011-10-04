@@ -396,6 +396,9 @@ var JSHINT = (function () {
                         expr_colon: "",                   // case x_:
                         colon_expr: " ",                  // case x:_break;
                         identifier_parenthesis: " "       // switch_(
+                    },
+                    "var": {
+                        identifier_name: " "             // var_name
                     }
                 }
             }
@@ -3666,7 +3669,7 @@ loop:   for (;;) {
         } else if (!funct['(global)']) {
             funct['(onevar)'] = true;
         }
-        format.testWhite(token, nexttoken, option.format.rules.needed);
+        format.testWhite(token, nexttoken, option.format.rules['var'].identifier_name);
         this.first = [];
         for (;;) {
             nonadjacent(token, nexttoken);
