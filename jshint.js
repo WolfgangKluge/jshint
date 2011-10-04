@@ -196,7 +196,7 @@
  XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
  asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
- caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
+ caller, cases, charAt, charCodeAt, character, checkformat, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
@@ -264,6 +264,7 @@ var JSHINT = (function () {
             bitwise     : true, // if bitwise operators should not be allowed
             boss        : true, // if advanced usage of assignments should be allowed
             browser     : true, // if the standard browser globals should be predefined
+            checkformat : true ,// if format whitespace rules apply
             couch       : true, // if CouchDB globals should be predefined
             curly       : true, // if curly braces around all blocks should be required
             debug       : true, // if debugger statements should be allowed
@@ -2103,6 +2104,143 @@ loop:   for (;;) {
                 dec: indent.dec,
                 set: indent.set,
                 unset: indent.unset
+            },
+            
+            indentation: function() {
+                if (option.checkformat) {
+                    if (nexttoken.id !== '(end)') {
+                        if (token.line != nexttoken.line) {
+                            if (indent.currentPosition() !== indent.lengthOf(nexttoken.white)) {
+                                warning(
+                                    "Expected indentation level of {a} (col {b}) " +
+                                    "but found {c} (col {d}).",
+                                    nexttoken,
+                                    indent.currentLevel(),
+                                    indent.currentPosition() + 1,
+                                    indent.levelOf(nexttoken.white),
+                                    indent.lengthOf(nexttoken.white) + 1
+                                );
+                            }
+                        } else {
+                            if (indent.currentPosition() + 1 !== nexttoken.from) {
+                                warning(
+                                    "Expected indentation level of {a} (col {b}) " + 
+                                    "but found {c} (col {d}).",
+                                    nexttoken,
+                                    indent.currentLevel(),
+                                    indent.currentPosition() + 1,
+                                    indent.levelFrom(nexttoken.from),
+                                    nexttoken.from
+                                );
+                            }
+                        }
+                    } else {
+                        var l = indent.lengthOf(nexttoken.white);
+                        if (l > 0){
+                            if (l > 0 && token.line === nexttoken.line) {
+                                warning("Trailing whitespace.", token);
+                            } else if ( indent.currentPosition() !== l ) {
+                                warning("Whitespace...");
+                            }
+                        }
+                    }
+                }
+            },
+            
+            direct: function(left, right, type, scope) {
+                if (left.line === right.line && right.white !== "" ) {
+                    warnWhitespace("Unexpected whitespace '{a}' before {b}.",
+                                   right, right.value, right.white);
+                }
+            },
+            
+            testWhite: function c(left, right, rule, allowTabAligned){
+                var msg;
+                if (option.checkformat) {
+                    // TODO: Tests with right.comment
+                    if (left.line === right.line) {
+                        
+                        if (rule === "") {
+                            if (right.white !== ""){
+                                if (allowTabAligned) {
+                                    if ((right.from - 1) % option.format.indent.tabSize === 0) {
+                                        return;
+                                    }
+                                }
+                                msg = "Unexpected whitespace '{d}' between '{b}' and '{c}'.";
+                            }
+                        } else {
+                            if (!new RegExp("^" + rule + "$").test(right.white)) {
+                                //console.log(c.caller.toString());
+                                if (allowTabAligned) {
+                                    if (new RegExp("^(" + rule + ")+$").test(right.white) &&
+                                        (right.from - 1) % option.format.indent.tabSize === 0) {
+                                        return;
+                                    }
+                                }
+                                msg = "Expected whitespace '{a}' between '{b}' and '{c}', " + 
+                                      "but '{d}' found.";
+                            }
+                        }
+                    }
+                    if (msg) {
+                        warning(msg, right, escapeWhitespace(rule), left.value,
+                                right.value, escapeWhitespace(right.white, 5));
+                    }
+                }
+            },
+            
+            testCommaAlign: function(left, right, stmt, scope, seperatorOnNewline){
+                if (option.checkformat && stmt.line !== right.line) {
+                    var pos = 0;
+                    if(scope === 'var'){
+                        pos = 3 + stmt.first[0].white.replace(/\t/g, getTabbedWhite(0)).length;
+                    } else if(scope === '('){
+                        pos = stmt.from - 1;
+                    }
+                    if (left.line === right.line) {
+                        if (!seperatorOnNewline) {
+                            warning("Unexpected comma in new line.", right);
+                        } else {
+                            // comma in front of the text
+                            // only allowed if useTabs === false
+                            /* e.g.
+                             * var x = 2
+                             *   , y = 2;
+                             */
+                            if (option.format.useTabs) {
+                                warning("Bad newline before ','.", right);
+                            }
+                            if (indent.currentPosition() + pos - right.white.length - 1 !==
+                                indent.lengthOf(left.white)) {
+                                warning("Bad alignment in {a} statement.", right, scope);
+                            }
+                        }
+                    } else {
+                        if (seperatorOnNewline) {
+                            warning("Expected comma to be in a new line.", right);
+                        } else {
+                            // comma at end of the prev line
+                            /* e.g.
+                             * var x = 2,
+                             *     y = 2;
+                             */
+                            if (indent.currentPosition() + pos !== indent.lengthOf(right.white)) {
+                                warning("Bad alignment in {a} statement. Excepted {b}, found {c}",
+                                        right, scope, indent.currentPosition() + pos,
+                                        indent.lengthOf(right.white));
+                            }
+                        }
+                    }
+                }
+            },
+            
+            lineBreakOrWhite: function (left, right, rule) {
+                // TODO
+            },
+            
+            lineBreak:function(left, right, type){
+                // TODO
             }
         };
     })();
