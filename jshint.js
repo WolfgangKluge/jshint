@@ -228,7 +228,7 @@
  inc, dec, currentPosition, getString, lengthOf, levelFrom, levelOf, set, unset,
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
  useTabs, tabSize, firstLevel, caseLabel, caseContent, rules,
- common, expr_comma, comma_expr,
+ common, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
  operators, expr_op, op_expr*/
 
 /*global exports: false */
@@ -337,13 +337,17 @@ var JSHINT = (function () {
                     tabSize: 4,             // indentation or size of a single tab
                     firstLevel: false,      // indent first level
                     caseLabel: false,       // indent case labels (including default:)
-                    caseContent: true       // indent content of a case block
+                    caseContent: true,      // indent content of a case block
+                    label: false            // indent lables
                 },
                 
                 rules: {
                     common: {
                         expr_comma: "",     // 1_, 2
-                        comma_expr: " "     // 1,_2
+                        comma_expr: " ",    // 1,_2
+                        label_colon: "",    // label_:
+                        expr_semicolon: "", // x.y()_;
+                        semicolon_expr: " " // x.y();_x = 2
                     },
                     operators: {
                         expr_op: " ",       // 1 +_2
@@ -2675,7 +2679,15 @@ loop:   for (;;) {
 // Is this a labelled statement?
 
         if (t.identifier && !t.reserved && peek().id === ':') {
+            if (option.format.indent.label) {
+                format.indentation();
+            } else {
+                if (t.white.length !== 0) {
+                    warning("Label '{a}' should not be indented.", t, t.value);
+                }
+            }
             advance();
+            format.testWhite(token, nexttoken, option.format.rules.common.label_colon);
             advance(':');
             scope = Object.create(s);
             addlabel(t.value, 'label');
@@ -2694,6 +2706,7 @@ loop:   for (;;) {
 // Parse the statement.
 
         if (!noindent) {
+            format.indentation();
             indentation();
         }
         r = expression(0, true);
@@ -2723,9 +2736,11 @@ loop:   for (;;) {
 
                 }
             } else {
+                format.testWhite(token, nexttoken, option.format.rules.common.expr_semicolon);
                 adjacent(token, nexttoken);
                 advance(';');
                 nonadjacent(token, nexttoken);
+                format.testWhite(token, nexttoken, option.format.rules.common.semicolon_expr);
             }
         }
 
