@@ -24,7 +24,7 @@ exports.checkRhino = function () {
 
 /** All test files must pass JSHint check */
 exports.checkTestFiles = function () {
-    var files = [ 'core.js', 'envs.js', 'options.js' ];
+    var files = [ 'core.js', 'envs.js', 'format.js', 'options.js' ];
 
     for (var i = 0, name; name = files[i]; i++) {
         var src = fs.readFileSync(__dirname + '/../tests/' + name, 'utf8'),
