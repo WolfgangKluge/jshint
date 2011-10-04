@@ -228,7 +228,7 @@
  inc, dec, currentPosition, getString, lengthOf, levelFrom, levelOf, set, unset,
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
  useTabs, tabSize, firstLevel, caseLabel, caseContent, rules, needed,
- common, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
+ common, expr_dot, dot_expr, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
  operators, unary_expr, expr_op, op_expr,
  block, identifier_bracket, parenthesis_bracket*/
 
@@ -345,6 +345,8 @@ var JSHINT = (function () {
                 rules: {
                     needed: " ",            // e.g. before and after 'in' or after 'delete'
                     common: {
+                        expr_dot: "",       // x_.y()
+                        dot_expr: "",       // x._y()
                         expr_comma: "",     // 1_, 2
                         comma_expr: " ",    // 1,_2
                         label_colon: "",    // label_:
@@ -3269,7 +3271,9 @@ loop:   for (;;) {
     infix('.', function (left, that) {
         adjacent(prevtoken, token);
         nobreak();
+        format.testWhite(prevtoken, token, option.format.rules.common.expr_dot);
         var m = identifier();
+        format.testWhite(prevtoken, token, option.format.rules.common.dot_expr);
         if (typeof m === 'string') {
             countMember(m);
         }
