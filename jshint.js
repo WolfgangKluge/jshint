@@ -229,7 +229,8 @@
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
  useTabs, tabSize, firstLevel, caseLabel, caseContent, rules,
  common, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
- operators, expr_op, op_expr*/
+ operators, expr_op, op_expr,
+ block, identifier_bracket, parenthesis_bracket*/
 
 /*global exports: false */
 
@@ -352,6 +353,10 @@ var JSHINT = (function () {
                     operators: {
                         expr_op: " ",       // 1 +_2
                         op_expr: " "        // 1_+ 2
+                    },
+                    block: {
+                        identifier_bracket: " ",  // else_{, finally_{, do_{, ...
+                        parenthesis_bracket: " "  // function ()_{
                     }
                 }
             }
@@ -2801,6 +2806,13 @@ loop:   for (;;) {
 
         inblock = ordinary;
         scope = Object.create(scope);
+        
+        if (token.identifier) {
+            format.testWhite(token, nexttoken, option.format.rules.block.identifier_bracket);
+        } else if (token.id === ')') {
+            format.testWhite(token, nexttoken, option.format.rules.block.parenthesis_bracket);
+        }
+        
         nonadjacent(token, nexttoken);
         t = nexttoken;
 
@@ -2820,6 +2832,7 @@ loop:   for (;;) {
                 strict_mode = m;
                 format.indent.dec();
                 indent -= option.indent;
+                format.indentation();
                 indentation();
             }
             advance('}', t);
