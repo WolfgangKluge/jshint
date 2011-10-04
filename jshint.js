@@ -227,8 +227,9 @@
  format, currentLevel,
  inc, dec, currentPosition, getString, lengthOf, levelFrom, levelOf, set, unset,
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
- useTabs, tabSize, firstLevel, caseLabel, caseContent,
- rules, common, expr_comma, comma_expr*/
+ useTabs, tabSize, firstLevel, caseLabel, caseContent, rules,
+ common, expr_comma, comma_expr,
+ operators, expr_op, op_expr*/
 
 /*global exports: false */
 
@@ -341,8 +342,12 @@ var JSHINT = (function () {
                 
                 rules: {
                     common: {
-                        expr_comma: "",
-                        comma_expr: " "
+                        expr_comma: "",     // 1_, 2
+                        comma_expr: " "     // 1,_2
+                    },
+                    operators: {
+                        expr_op: " ",       // 1 +_2
+                        op_expr: " "        // 1_+ 2
                     }
                 }
             }
@@ -2463,6 +2468,8 @@ loop:   for (;;) {
         x.led = function (left) {
             nobreaknonadjacent(prevtoken, token);
             nonadjacent(token, nexttoken);
+            format.testWhite(prevtoken, token, option.format.rules.operators.expr_op);
+            format.testWhite(token, nexttoken, option.format.rules.operators.op_expr);
             var right = expression(100);
             if ((left && left.id === 'NaN') || (right && right.id === 'NaN')) {
                 warning("Use the isNaN function to compare with NaN.", this);
@@ -2511,12 +2518,18 @@ loop:   for (;;) {
                         warning('Bad assignment.', that);
                     }
                     that.right = expression(19);
+                    
+                    format.testWhite(that.left, that, option.format.rules.operators.expr_op);
+                    format.testWhite(that, that.right, option.format.rules.operators.op_expr);
                     return that;
                 } else if (left.identifier && !left.reserved) {
                     if (funct[left.value] === 'exception') {
                         warning("Do not assign to the exception parameter.", left);
                     }
                     that.right = expression(19);
+                    
+                    format.testWhite(that.left, that, option.format.rules.operators.expr_op);
+                    format.testWhite(that, that.right, option.format.rules.operators.op_expr);
                     return that;
                 }
                 if (left === syntax['function']) {
@@ -2539,6 +2552,9 @@ loop:   for (;;) {
             }
             this.left = left;
             this.right = expression(p);
+            
+            format.testWhite(this.left, this, option.format.rules.operators.expr_op);
+            format.testWhite(this, this.right, option.format.rules.operators.op_expr);
             return this;
         };
         return x;
