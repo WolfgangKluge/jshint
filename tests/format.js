@@ -22,6 +22,7 @@ exports.format_whitespace = function () {
         .addError(3, "Expected whitespace '\xB7' between 'return' and '+', but '\xB7\xB7\xB7' found.")
         .addError(3, "Unexpected whitespace '\xB7\xB7' between '+' and '2'.")
         .addError(5, "Expected whitespace '\xB7' between 'function' and '(', but '\xB7\xB7' found.")
+        .addError(5, "Expected whitespace '\xB7' between ',' and 'b', but '\xB7\xB7\xB7' found.")
         .addError(5, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7\xB7' found.")
         // try
         .addError(7, "Expected whitespace '\xB7' between 'try' and '{', but '\xB7\xB7' found.")

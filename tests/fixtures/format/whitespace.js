@@ -2,7 +2,7 @@
 function  hello()   { 
     return   +  2;
 }
-var x = function  ()   {};
+var x = function  (a,   b)   {};
 
 try  {
 }  catch   (    ex     )      {
