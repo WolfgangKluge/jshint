@@ -741,7 +741,7 @@ var JSHINT = (function () {
             ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i;
 
             // unsafe characters that are silently deleted by one or more browsers
-            cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
+            cx = /[\u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 
             // token
             tx = /^(\s*)([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
@@ -2052,10 +2052,12 @@ loop:   for (;;) {
         var i;
         if (option.white && nexttoken.id !== '(end)') {
             i = indent + (bias || 0);
-            if (nexttoken.from !== i) {
+            var tabs = nexttoken.white.length - nexttoken.white.replace(/\t/g, "").length;
+            tabs = tabs * option.indent - tabs;
+            if (nexttoken.from + tabs !== i) {
                 warning(
 "Expected '{a}' to have an indentation at {b} instead at {c}.",
-                        nexttoken, nexttoken.value, i, nexttoken.from);
+                        nexttoken, nexttoken.value, i, nexttoken.from + tabs);
             }
         }
     }
