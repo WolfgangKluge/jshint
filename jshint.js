@@ -231,9 +231,10 @@
  common, expr_dot, dot_expr, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
  identifier_parenthesis, expr_parenthesis, parenthesis_expr, semicolon_semicolon,
  operators, unary_expr, expr_op, op_expr, name_assignment, assignment_expr,
- block, identifier_bracket, bracket_identifier, parenthesis_bracket
+ block, identifier_bracket, bracket_identifier, parenthesis_bracket, identifier_identifier,
  objectLiteral, name_colon, colon_expr,
- identifier_name, name_parenthesis*/
+ identifier_name, name_parenthesis,
+ if*/
 
 /*global exports: false */
 
@@ -369,9 +370,10 @@ var JSHINT = (function () {
                         assignment_expr: " "    // var x =_2
                     },
                     block: {
-                        identifier_bracket: " ",  // else_{, finally_{, do_{, ...
-                        bracket_identifier: " ",  // }_else, }_catch, }_while, ...
-                        parenthesis_bracket: " "  // function ()_{
+                        identifier_bracket: " ",    // else_{, finally_{, do_{, ...
+                        bracket_identifier: " ",    // }_else, }_catch, }_while, ...
+                        parenthesis_bracket: " ",   // function ()_{
+                        identifier_identifier: " "  // } else_if {
                     },
                     objectLiteral: {
                         name_colon: "",           // x_: value
@@ -381,6 +383,11 @@ var JSHINT = (function () {
                         identifier_name: " ",            // function_x (
                         name_parenthesis: "",            // function x_(
                         identifier_parenthesis: " "      // function_(       anonymous function
+                    },
+                    "if": {
+                        parenthesis_expr: "",            // if (_x )
+                        expr_parenthesis: "",            // if ( x_)
+                        identifier_parenthesis: " "      // if_( x )
                     }
                 }
             }
@@ -3731,6 +3738,8 @@ loop:   for (;;) {
     blockstmt('if', function () {
         var t = nexttoken;
         advance('(');
+		format.testWhite(this, t, option.format.rules['if'].identifier_parenthesis);
+		format.testWhite(t, nexttoken, option.format.rules['if'].parenthesis_expr);
         nonadjacent(this, t);
         nospace();
         expression(20);
@@ -3741,11 +3750,18 @@ loop:   for (;;) {
             expression(20);
         }
         advance(')', t);
+		format.testWhite(prevtoken, token, option.format.rules['if'].expr_parenthesis);
         nospace(prevtoken, token);
         block(true, true);
         if (nexttoken.id === 'else') {
+            if(token.id === '}'){
+                format.testWhite(token, nexttoken, option.format.rules.block.bracket_identifier);
+            }
             nonadjacent(token, nexttoken);
             advance('else');
+            if (nexttoken.identifier) {
+				format.testWhite(token, nexttoken, option.format.rules.block.identifier_identifier);
+            }
             if (nexttoken.id === 'if' || nexttoken.id === 'switch') {
                 statement(true);
             } else {

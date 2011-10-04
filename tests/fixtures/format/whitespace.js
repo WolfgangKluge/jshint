@@ -1,4 +1,4 @@
-/*jshint white: true*/
+/*jshint white: true, maxerr: 100*/
 function  hello()   { 
     return   +  2;
 }
@@ -37,3 +37,5 @@ var to = {
     b  :   3, // tab indented
     c: 4
 };
+
+if  (1 === 2)  {}  else  if (2 === 3) {}
