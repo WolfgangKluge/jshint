@@ -2603,6 +2603,9 @@ loop:   for (;;) {
             }
             nonadjacent(prevtoken, token);
             nonadjacent(token, nexttoken);
+            
+            format.testWhite(prevtoken, token, option.format.rules.operators.name_assignment);
+            format.testWhite(token, nexttoken, option.format.rules.operators.assignment_expr);
             if (left) {
                 if (left.id === '.' || left.id === '[' ||
                         (left.identifier && !left.reserved)) {
