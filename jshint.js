@@ -744,7 +744,7 @@ var JSHINT = (function () {
             cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 
             // token
-            tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
+            tx = /^(\s*)([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
 
             // characters in strings that need escapement
             nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
@@ -1026,7 +1026,7 @@ var JSHINT = (function () {
 
 // Produce a token object.  The token inherits from a syntax symbol.
 
-        function it(type, value) {
+        function it(type, value, ws) {
             var i, t;
             if (type === '(color)' || type === '(range)') {
                 t = {type: type};
@@ -1062,6 +1062,7 @@ var JSHINT = (function () {
             t.line = line;
             t.character = character;
             t.from = from;
+            t.white = ws;
             i = t.id;
             if (i !== '(endline)') {
                 prereg = i &&
@@ -1124,13 +1125,18 @@ var JSHINT = (function () {
 
             // token -- this is called by advance to get the next token
             token: function () {
-                var b, c, captures, d, depth, high, i, l, low, q, t;
+                var b, c, captures, d, depth, high, i, l, low, q, t, ws;
 
-                function match(x) {
+                function match(x, checkws) {
                     var r = x.exec(s), r1;
                     if (r) {
                         l = r[0].length;
-                        r1 = r[1];
+                        r1 = r[checkws ? 2 : 1];
+                        if (checkws) {
+                            ws = r[1];
+                        } else {
+                            ws = "";
+                        }
                         c = r1.charAt(0);
                         s = s.substr(l);
                         from = character + l - r1.length;
@@ -1139,8 +1145,13 @@ var JSHINT = (function () {
                     }
                 }
 
+<<<<<<< HEAD
                 function string(x) {
                     var c, j, r = '', allowNewLine = false;
+=======
+                function string(x, ws) {
+                    var c, j, r = '';
+>>>>>>> f0a04f0... Add preceding whitespace to token
 
                     if (jsonmode && x !== '"') {
                         warningAt("Strings must use doublequote.",
@@ -1174,7 +1185,7 @@ var JSHINT = (function () {
                         if (c === x) {
                             character += 1;
                             s = s.substr(j + 1);
-                            return it('(string)', r, x);
+                            return it('(string)', r, ws);
                         }
                         if (c < ' ') {
                             if (c === '\n' || c === '\r') {
@@ -1256,7 +1267,7 @@ var JSHINT = (function () {
                     if (!s) {
                         return it(nextLine() ? '(endline)' : '(end)', '');
                     }
-                    t = match(tx);
+                    t = match(tx, true);
                     if (!t) {
                         t = '';
                         c = '';
@@ -1271,7 +1282,7 @@ var JSHINT = (function () {
     //      identifier
 
                         if (c.isAlpha() || c === '_' || c === '$') {
-                            return it('(identifier)', t);
+                            return it('(identifier)', t, ws);
                         }
 
     //      number
@@ -1301,7 +1312,7 @@ var JSHINT = (function () {
                                 warningAt(
 "A trailing decimal point can be confused with a dot '{a}'.", line, character, t);
                             }
-                            return it('(number)', t);
+                            return it('(number)', t, ws);
                         }
                         switch (t) {
 
@@ -1309,7 +1320,7 @@ var JSHINT = (function () {
 
                         case '"':
                         case "'":
-                            return string(t);
+                            return string(t, ws);
 
     //      // comment
 
@@ -1403,7 +1414,7 @@ var JSHINT = (function () {
                                             errorAt("Confusing regular expression.",
                                                     line, from);
                                         }
-                                        return it('(regexp)', c);
+                                        return it('(regexp)', c, ws);
                                     case '\\':
                                         c = s.charAt(l);
                                         if (c < ' ') {
@@ -1603,16 +1614,16 @@ klass:                                  do {
                                 c = s.substr(0, l - 1);
                                 character += l;
                                 s = s.substr(l);
-                                return it('(regexp)', c);
+                                return it('(regexp)', c, ws);
                             }
-                            return it('(punctuator)', t);
+                            return it('(punctuator)', t, ws);
 
     //      punctuator
 
                         case '#':
-                            return it('(punctuator)', t);
+                            return it('(punctuator)', t, ws);
                         default:
-                            return it('(punctuator)', t);
+                            return it('(punctuator)', t, ws);
                         }
                     }
                 }
