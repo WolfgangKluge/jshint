@@ -4036,11 +4036,11 @@ loop:   for (;;) {
             nolinebreak(token);
             advance(';');
             if (nexttoken.id === ';') {
-                format.testWhite(token, nexttoken, option.format.rules.common.semicolon_expr);
                 error("Expected '{a}' and instead saw '{b}'.",
                         nexttoken, ')', ';');
             }
             if (nexttoken.id !== ')') {
+                format.testWhite(token, nexttoken, option.format.rules.common.semicolon_expr);
                 for (;;) {
                     expression(0, 'for');
                     if (nexttoken.id !== ',') {

@@ -22,7 +22,7 @@ do  {
 do {
 }while (true);
 
-for  (var   i  ;   i  <   3  ;   i  ++)   {}
+for  (var   i  ;   i  <   3  ;    i  ++)   {}
 for (var i;i < 3;i++) {}
 for (;  ;) {}
 for (var i; i < 3; i++) {}
