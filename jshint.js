@@ -231,7 +231,8 @@
  common, expr_dot, dot_expr, expr_comma, comma_expr, label_colon, expr_semicolon, semicolon_expr,
  identifier_parenthesis, expr_parenthesis, parenthesis_expr, semicolon_semicolon,
  operators, unary_expr, expr_op, op_expr, name_assignment, assignment_expr,
- block, identifier_bracket, bracket_identifier, parenthesis_bracket*/
+ block, identifier_bracket, bracket_identifier, parenthesis_bracket
+ identifier_name, name_parenthesis*/
 
 /*global exports: false */
 
@@ -370,6 +371,12 @@ var JSHINT = (function () {
                         identifier_bracket: " ",  // else_{, finally_{, do_{, ...
                         bracket_identifier: " ",  // }_else, }_catch, }_while, ...
                         parenthesis_bracket: " "  // function ()_{
+                    },
+                    
+                    "function": {
+                        identifier_name: " ",            // function_x (
+                        name_parenthesis: "",            // function x_(
+                        identifier_parenthesis: " "      // function_(       anonymous function
                     }
                 }
             }
@@ -3682,6 +3689,8 @@ loop:   for (;;) {
 
         }
         var i = identifier();
+        format.testWhite(prevtoken, token, option.format.rules['function'].identifier_name);
+        format.testWhite(token, nexttoken, option.format.rules['function'].name_parenthesis);
         adjacent(token, nexttoken);
         addlabel(i, 'unction');
         doFunction(i, true);
@@ -3695,8 +3704,11 @@ loop:   for (;;) {
     prefix('function', function () {
         var i = optionalidentifier();
         if (i) {
+            format.testWhite(prevtoken, token, option.format.rules['function'].identifier_name);
+            format.testWhite(token, nexttoken, option.format.rules['function'].name_parenthesis);
             adjacent(token, nexttoken);
         } else {
+            format.testWhite(token, nexttoken, option.format.rules['function'].identifier_parenthesis);
             nonadjacent(token, nexttoken);
         }
         doFunction(i);

@@ -17,16 +17,19 @@ exports.format_whitespace = function () {
 
     TestRun()
         // function
-        .addError(2, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7' found.")
+        .addError(2, "Expected whitespace '\xB7' between 'function' and 'hello', but '\xB7\xB7' found.")
+        .addError(2, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7\xB7' found.")
         .addError(3, "Expected whitespace '\xB7' between 'return' and '+', but '\xB7\xB7\xB7' found.")
         .addError(3, "Unexpected whitespace '\xB7\xB7' between '+' and '2'.")
+        .addError(5, "Expected whitespace '\xB7' between 'function' and '(', but '\xB7\xB7' found.")
+        .addError(5, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7\xB7' found.")
         // try
-        .addError(6, "Expected whitespace '\xB7' between 'try' and '{', but '\xB7\xB7' found.")
-        .addError(7, "Expected whitespace '\xB7' between '}' and 'catch', but '\xB7\xB7' found.")
-        .addError(7, "Expected whitespace '\xB7' between 'catch' and '(', but '\xB7\xB7\xB7' found.")
-        .addError(7, "Unexpected whitespace '\xB7\xB7\xB7\xB7' between '(' and 'ex'.")
-        .addError(7, "Unexpected whitespace '\xB7\xB7\xB7\xB7\xB7' between 'ex' and ')'.")
-        .addError(7, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7\xB7\xB7\xB7...' found.")
+        .addError(7, "Expected whitespace '\xB7' between 'try' and '{', but '\xB7\xB7' found.")
+        .addError(8, "Expected whitespace '\xB7' between '}' and 'catch', but '\xB7\xB7' found.")
+        .addError(8, "Expected whitespace '\xB7' between 'catch' and '(', but '\xB7\xB7\xB7' found.")
+        .addError(8, "Unexpected whitespace '\xB7\xB7\xB7\xB7' between '(' and 'ex'.")
+        .addError(8, "Unexpected whitespace '\xB7\xB7\xB7\xB7\xB7' between 'ex' and ')'.")
+        .addError(8, "Expected whitespace '\xB7' between ')' and '{', but '\xB7\xB7\xB7\xB7\xB7...' found.")
         .addError(11, "Expected whitespace '\xB7' between '}' and 'catch', but '' found.")
         // throw
         .addError(14, "Expected whitespace '\xB7' between 'throw' and 'test', but '\xB7\xB7\xB7' found.")

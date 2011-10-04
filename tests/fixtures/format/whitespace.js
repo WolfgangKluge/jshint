@@ -1,12 +1,12 @@
 /*jshint white: true*/
-function  hello()  { 
+function  hello()   { 
     return   +  2;
 }
+var x = function  ()   {};
 
 try  {
 }  catch   (    ex     )      {
 }
-
 try {
 }catch (ex) {}
 
