@@ -227,7 +227,8 @@
  format, currentLevel,
  inc, dec, currentPosition, getString, lengthOf, levelFrom, levelOf, set, unset,
  indentation, direct, testWhite, testCommaAlign, lineBreakOrWhite, lineBreak
- useTabs, tabSize, firstLevel*/
+ useTabs, tabSize, firstLevel,
+ rules, common, expr_comma, comma_expr*/
 
 /*global exports: false */
 
@@ -334,6 +335,13 @@ var JSHINT = (function () {
                     useTabs: false,         // use tab instead of blanks
                     tabSize: 4,             // indentation or size of a single tab
                     firstLevel: false       // indent first level
+                },
+                
+                rules: {
+                    common: {
+                        expr_comma: "",
+                        comma_expr: " "
+                    }
                 }
             }
         },
@@ -2331,7 +2339,9 @@ loop:   for (;;) {
         } else if (token.character !== nexttoken.from && option.white) {
             warning("Unexpected space after '{a}'.", nexttoken, token.value);
         }
+        format.testWhite(token, nexttoken, option.format.rules.common.expr_comma);
         advance(',');
+        format.testWhite(token, nexttoken, option.format.rules.common.comma_expr);
         nonadjacent(token, nexttoken);
     }
 
