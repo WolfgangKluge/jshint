@@ -305,3 +305,28 @@ exports.format_switch = function () {
         .addError(137, "Expected indentation level of 2 (col 9) but found 0 (col 1).")
         .test(src, {white: false});
 };
+
+/**
+ * For statement rules
+ * different whitespace rules in for statement
+ */
+exports.format_for = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/format/for.js", "utf8");
+
+    TestRun()
+        .addError(25, "Missing space after 'for'.")
+        .addError(25, "Unexpected space after '('.")
+        .addError(25, "Unexpected space after '++'.")
+        .addError(39, "Unexpected space after '('.")
+        .addError(39, "Unexpected space after '++'.")
+        .addError(40, "Missing space after 'for'.")
+        .addError(40, "Unexpected space after '('.")
+        .addError(40, "Unexpected space after '++'.")
+        .test(src, {white: true, checkformat: false});
+
+    TestRun()
+        .addError(38, "Expected whitespace '\xB7+' between '++' and ')', but '' found.")
+        .addError(39, "Expected whitespace '\xB7\xB7' between 'for' and '(', but '\xB7' found.")
+        .addError(40, "Expected whitespace '\xB7\xB7' between 'for' and '(', but '' found.")
+        .test(src, {white: false, checkformat: true});
+};

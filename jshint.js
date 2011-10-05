@@ -234,7 +234,7 @@
  block, identifier_bracket, bracket_identifier, parenthesis_bracket, identifier_identifier,
  objectLiteral, name_colon, colon_expr,
  identifier_name, name_parenthesis, parameters, parenthesis_name, parenthesis_parenthesis,
- if, switch, case_expr, expr_colon*/
+ if, for, switch, case_expr, expr_colon*/
 
 /*global exports: false */
 
@@ -394,6 +394,11 @@ var JSHINT = (function () {
                         parenthesis_expr: "",             // if (_x )
                         expr_parenthesis: "",             // if ( x_)
                         identifier_parenthesis: " "       // if_( x )
+                    },
+                    "for": {
+                        parenthesis_expr: "",             // for (_x )
+                        expr_parenthesis: "",             // for ( x_)
+                        identifier_parenthesis: " "       // for_( 
                     },
                     "switch": {
                         parenthesis_expr: "",             // switch (_x )
@@ -4021,9 +4026,9 @@ loop:   for (;;) {
         var s, t = nexttoken;
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
-        format.testWhite(token, nexttoken, option.format.rules.common.identifier_parenthesis);
+        format.testWhite(token, nexttoken, option.format.rules['for'].identifier_parenthesis);
         advance('(');
-        format.testWhite(token, nexttoken, option.format.rules.common.parenthesis_expr);
+        format.testWhite(token, nexttoken, option.format.rules['for'].parenthesis_expr);
         nonadjacent(this, t);
         nospace();
         if (peek(nexttoken.id === 'var' ? 1 : 0).id === 'in') {
@@ -4047,7 +4052,7 @@ loop:   for (;;) {
             advance('in');
             format.testWhite(token, nexttoken, option.format.rules.needed);
             expression(20);
-            format.testWhite(token, nexttoken, option.format.rules.common.expr_parenthesis);
+            format.testWhite(token, nexttoken, option.format.rules['for'].expr_parenthesis);
             advance(')', t);
             s = block(true, true);
             if (option.forin && (s.length > 1 || typeof s[0] !== 'object' ||
@@ -4105,7 +4110,7 @@ loop:   for (;;) {
                     comma();
                 }
             }
-            format.testWhite(token, nexttoken, option.format.rules.common.expr_parenthesis);
+            format.testWhite(token, nexttoken, option.format.rules['for'].expr_parenthesis);
             advance(')', t);
             nospace(prevtoken, token);
             block(true, true);
