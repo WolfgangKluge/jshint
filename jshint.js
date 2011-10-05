@@ -1234,13 +1234,9 @@ var JSHINT = (function () {
                     }
                 }
 
-<<<<<<< HEAD
-                function string(x) {
-                    var c, j, r = '', allowNewLine = false;
-=======
+
                 function string(x, ws) {
-                    var c, j, r = '';
->>>>>>> f0a04f0... Add preceding whitespace to token
+                    var c, j, r = '', allowNewLine = false;
 
                     if (jsonmode && x !== '"') {
                         warningAt("Strings must use doublequote.",

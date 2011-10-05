@@ -141,7 +141,6 @@ exports.functionScopedOptions = function () {
 exports.jslintOptions = function() {
     var src = fs.readFileSync(__dirname + '/fixtures/jslintOptions.js', 'utf8');
     TestRun().test(src);
-<<<<<<< HEAD
 };
 
 exports.caseExpressions = function() {
@@ -182,8 +181,6 @@ exports.complexOptions = function() {
     assert.eql(JSHINT.errors[11].reason, "Bad option.");
     assert.eql(JSHINT.errors[12].line, 28);
     assert.eql(JSHINT.errors[12].reason, "Missing option value.");
-=======
->>>>>>> 18fa6ae... Use testHelper for tests
 };
 
 exports.complexOptions = function() {
